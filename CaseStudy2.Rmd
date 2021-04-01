@@ -66,9 +66,9 @@ employee.data %>% ggplot(aes(x = as.factor(employee.data$JobSatisfaction))) + ge
 
 yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(JobSatisfaction), y=..prop.., group = 1)) + geom_bar() + ggtitle("Attrition")
 
-yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) 
+yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Satisfaction Level", x = "Job Satisfaction")
 
-no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) 
+no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Satisfaction Level", x = "Job Satisfaction")
 
 
 
