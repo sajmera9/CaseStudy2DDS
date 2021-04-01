@@ -74,6 +74,7 @@ no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..)
 
 no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction))) + geom_bar() + ggtitle("No Attrition")
 
+
 fill = factor(..x..)
 
 
@@ -82,13 +83,60 @@ yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(Jo
 no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(JobSatisfaction))) + geom_bar() + ggtitle("No Attrition")
 
 
+```
+
+
+
+
+```{r}
+employee.data$JobSatisfaction = as.factor(employee.data$JobSatisfaction)
+fit = aov(HourlyRate ~ JobSatisfaction, data = employee.data)
+summary(fit)
+```
+
+
+```{r}
+ggplot(data = employee.data, aes(x=DailyRate)) +
+geom_histogram(aes(fill=JobSatisfaction)) +
+facet_wrap( ~ JobSatisfaction, ncol=2) +
+theme_bw()
+
+ggplot(data = employee.data, aes(x=HourlyRate)) +
+geom_histogram(aes(fill=JobSatisfaction)) +
+facet_wrap( ~ JobSatisfaction, ncol=2) +
+theme_bw()
+
+ggplot(data = employee.data, aes(x=MonthlyRate)) +
+geom_histogram(aes(fill=JobSatisfaction)) +
+facet_wrap( ~ JobSatisfaction, ncol=2) +
+theme_bw()
+
+ggplot(data = employee.data, aes(x=MonthlyIncome)) +
+geom_histogram(aes(fill=JobSatisfaction)) +
+facet_wrap( ~ JobSatisfaction, ncol=2) +
+theme_bw()
+
+ggplot(data = employee.data, aes(sample=MonthlyIncome)) +
+stat_qq() +
+facet_wrap( ~ JobSatisfaction, ncol=1) +
+theme_bw()
+
+oneway.test(Income2005 ~ Educ, data=edu, var.equal=F)
+
+
+kruskal.test(DailyRate ~ JobSatisfaction, data=employee.data)
+kruskal.test(HourlyRate ~ JobSatisfaction, data=employee.data)
+kruskal.test(MonthlyRate ~ JobSatisfaction, data=employee.data)
+kruskal.test(MonthlyIncome ~ JobSatisfaction, data=employee.data)
 
 
 
 ```
 
 
+```{r}
 
+```
 
 
 
