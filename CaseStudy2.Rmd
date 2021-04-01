@@ -12,6 +12,83 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 employee.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
+employee.data
+#check for missing values
+library(naniar)
+gg_miss_var(employee.data)
+#no missing values in employee.data
+sapply(employee.data, function(x) sum(is.na(x)))
+```
+
+```{r}
+#
+summary(employee.data)
+no.attrition = employee.data %>% filter(Attrition == "No")
+str(no.attrition)
+yes.attrition = employee.data %>% filter(Attrition == "Yes")
+str(yes.attrition)
 
 ```
+
+```{r}
+yes.attrition %>% ggplot(aes(x = Age)) + geom_histogram()
+no.attrition %>% ggplot(aes(x = Age)) + geom_histogram()
+```
+
+
+```{r}
+yes.attrition %>% ggplot(aes(x = Department)) + geom_bar()
+no.attrition %>% ggplot(aes(x = Department)) + geom_bar()
+```
+
+```{r}
+no.attrition %>% ggplot(aes(x = Department)) + geom_bar(fill=no.attrition$Department)
+no.attrition %>% ggplot(mapping = aes(x = Department, y = ..prop.., group = 1)) + geom_bar(fill = Department)
+yes.attrition %>% ggplot(mapping = aes(x = Department, y = ..prop.., group = 1)) + geom_bar()
+```
+
+
+
+```{r}
+employee.data[employee.data$Attrition == "Yes",] %>% ggplot(aes(x=Department)) + geom_bar()
+```
+
+```{r}
+
+```
+
+
+```{r}
+#convert job satisfaction to a factor and get bar plot, use percent 
+
+employee.data %>% ggplot(aes(x = as.factor(employee.data$JobSatisfaction))) + geom_bar()
+
+
+yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(JobSatisfaction), y=..prop.., group = 1)) + geom_bar() + ggtitle("Attrition")
+
+yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) 
+
+no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) 
+
+
+
+no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction))) + geom_bar() + ggtitle("No Attrition")
+
+fill = factor(..x..)
+
+
+yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(JobSatisfaction))) + geom_bar() + ggtitle("Attrition")
+
+no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(JobSatisfaction))) + geom_bar() + ggtitle("No Attrition")
+
+
+
+
+
+```
+
+
+
+
+
 
