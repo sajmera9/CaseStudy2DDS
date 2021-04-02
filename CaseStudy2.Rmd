@@ -85,41 +85,6 @@ no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(Job
 
 ```
 
-
-```{r}
-employee.data$JobSatisfaction = as.factor(employee.data$JobSatisfaction)
-fit = aov(HourlyRate ~ JobSatisfaction, data = employee.data)
-summary(fit)
-
-
-
-ne = employee.data %>% select(JobSatisfaction,DailyRate)
-
-ne %>% group_by(JobSatisfaction, DailyRate) %>% summarize(new_count = n())
-employee.data %>% group_by(JobSatisfaction) %>% summarize(new_count = n())
-
-
-employee.data %>%
-  group_by(JobSatisfaction) %>%
-  summarize(var=var(HourlyRate))
-
-
-bf.test(HourlyRate ~ JobSatisfaction, data = employee.data)
-welch.test(HourlyRate ~ JobSatisfaction, data = employee.data)
-
-
-bf.test(DailyRate ~ JobSatisfaction, data = employee.data)
-welch.test(DailyRate ~ JobSatisfaction, data = employee.data)
-
-bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-aov(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-welch.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-
-group_by(employee.data$JobSatisfaction) %>% summarize(meanAge = count(DailyRate))
-
-```
-
-
 ```{r}
 ggplot(data = employee.data, aes(x=DailyRate)) +
 geom_histogram(aes(fill=JobSatisfaction)) +
@@ -146,6 +111,136 @@ ggplot(data = employee.data, aes(sample=MonthlyIncome)) +
 stat_qq() +
 facet_wrap( ~ JobSatisfaction, ncol=1) +
 theme_bw()
+```
+
+
+```{r}
+employee.data$JobSatisfaction = as.factor(employee.data$JobSatisfaction)
+fit = aov(HourlyRate ~ JobSatisfaction, data = employee.data)
+summary(fit)
+
+
+
+ne = employee.data %>% select(JobSatisfaction,DailyRate)
+
+ne %>% group_by(JobSatisfaction, DailyRate) %>% summarize(new_count = n())
+employee.data %>% group_by(JobSatisfaction) %>% summarize(new_count = n())
+
+
+employee.data %>%
+  group_by(JobSatisfaction) %>%
+  summarize(var=var(HourlyRate))
+
+
+##***## 
+##**## Job Satisfaction - HourlyRate
+employee.data %>% group_by(JobSatisfaction) %>%
+  summarise(
+    count = n(),
+    mean = mean(HourlyRate, na.rm = TRUE),
+    sd = sd(HourlyRate, na.rm = TRUE),
+    median = median(HourlyRate, na.rm = TRUE),
+    IQR = IQR(HourlyRate, na.rm = TRUE)
+  )
+##***##
+
+library(onewaytests)
+fit = aov(HourlyRate~JobSatisfaction, data = employee.data)
+summary(fit)
+
+library(lsmeans)
+
+#Contrast 1
+fit4 = lm(HourlyRate ~ JobSatisfaction, data = employee.data)
+summary(fit4)
+fit4
+
+leastsquare = lsmeans(fit4,"JobSatisfaction")
+
+Contrasts = list(OneTwoVersusThreeFour= c(0.5,0.5,-0.5,-0.5))
+
+contrast(leastsquare,Contrasts)
+
+#Contrast 2
+fit4 = lm(HourlyRate ~ JobSatisfaction, data = employee.data)
+summary(fit4)
+fit4
+
+leastsquare = lsmeans(fit4,"JobSatisfaction")
+
+Contrasts = list(OneTwoVersusThreeFour= c(1,0,-0.5,-0.5))
+#Contrasts = list(OneTwoVersusThreeFour= c(1,0,0,-1))
+#Contrasts = list(OneTwoVersusThreeFour= c(1,0,0,-1))
+contrast(leastsquare,Contrasts)
+
+
+
+
+bf.test(HourlyRate ~ JobSatisfaction, data = employee.data)
+welch.test(HourlyRate ~ JobSatisfaction, data = employee.data)
+
+
+#Job Satisfaction - DailyRate
+employee.data %>% group_by(JobSatisfaction) %>%
+  summarise(
+    count = n(),
+    mean = mean(DailyRate, na.rm = TRUE),
+    sd = sd(DailyRate, na.rm = TRUE),
+    median = median(DailyRate, na.rm = TRUE),
+    IQR = IQR(DailyRate, na.rm = TRUE)
+  )
+
+
+fit1 = aov(DailyRate~JobSatisfaction, data = employee.data)
+summary(fit1)
+
+#Job Satisfaction - MonthlyRate
+employee.data %>% group_by(JobSatisfaction) %>%
+  summarise(
+    count = n(),
+    mean = mean(MonthlyRate, na.rm = TRUE),
+    sd = sd(MonthlyRate, na.rm = TRUE),
+    median = median(MonthlyRate, na.rm = TRUE),
+    IQR = IQR(MonthlyRate, na.rm = TRUE)
+  )
+
+
+fit2 = aov(MonthlyRate~JobSatisfaction, data = employee.data)
+summary(fit2)
+
+#Job Satisfaction - MonthlyIncome
+employee.data %>% group_by(JobSatisfaction) %>%
+  summarise(
+    count = n(),
+    mean = mean(MonthlyIncome, na.rm = TRUE),
+    sd = sd(MonthlyIncome, na.rm = TRUE),
+    median = median(MonthlyIncome, na.rm = TRUE),
+    IQR = IQR(MonthlyIncome, na.rm = TRUE)
+  )
+
+
+bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+fit3 = aov(MonthlyIncome~JobSatisfaction, data = employee.data)
+summary(fit3)
+kruskal.test(MonthlyIncome ~ JobSatisfaction, data=employee.data)
+
+
+
+
+bf.test(DailyRate ~ JobSatisfaction, data = employee.data)
+welch.test(DailyRate ~ JobSatisfaction, data = employee.data)
+
+bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+aov(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+welch.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+
+group_by(employee.data$JobSatisfaction) %>% summarize(meanAge = count(DailyRate))
+
+```
+
+
+```{r}
+
 
 oneway.test(Income2005 ~ Educ, data=edu, var.equal=F)
 
