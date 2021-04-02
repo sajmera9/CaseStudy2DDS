@@ -86,12 +86,37 @@ no.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(Job
 ```
 
 
-
-
 ```{r}
 employee.data$JobSatisfaction = as.factor(employee.data$JobSatisfaction)
 fit = aov(HourlyRate ~ JobSatisfaction, data = employee.data)
 summary(fit)
+
+
+
+ne = employee.data %>% select(JobSatisfaction,DailyRate)
+
+ne %>% group_by(JobSatisfaction, DailyRate) %>% summarize(new_count = n())
+employee.data %>% group_by(JobSatisfaction) %>% summarize(new_count = n())
+
+
+employee.data %>%
+  group_by(JobSatisfaction) %>%
+  summarize(var=var(HourlyRate))
+
+
+bf.test(HourlyRate ~ JobSatisfaction, data = employee.data)
+welch.test(HourlyRate ~ JobSatisfaction, data = employee.data)
+
+
+bf.test(DailyRate ~ JobSatisfaction, data = employee.data)
+welch.test(DailyRate ~ JobSatisfaction, data = employee.data)
+
+bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+aov(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+welch.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
+
+group_by(employee.data$JobSatisfaction) %>% summarize(meanAge = count(DailyRate))
+
 ```
 
 
@@ -100,6 +125,7 @@ ggplot(data = employee.data, aes(x=DailyRate)) +
 geom_histogram(aes(fill=JobSatisfaction)) +
 facet_wrap( ~ JobSatisfaction, ncol=2) +
 theme_bw()
+
 
 ggplot(data = employee.data, aes(x=HourlyRate)) +
 geom_histogram(aes(fill=JobSatisfaction)) +
