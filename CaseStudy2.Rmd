@@ -11,8 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-
-
 #Read all csvs
 emp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
 newemp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
@@ -38,7 +36,7 @@ sapply(employee.data, function(x) sum(is.na(x)))
 ```
 
 ```{r}
-#Seperate employees by attrition into two dataframes called no.attrition and yes.attrition
+#Separate employees by attrition into two dataframes called no.attrition and yes.attrition
 no.attrition = emp.data %>% filter(Attrition == "No")
 yes.attrition = emp.data %>% filter(Attrition == "Yes")
 
@@ -112,7 +110,7 @@ contrast(leastsquare,Contrasts)
 ```{r}
 #Life sciences and medical field composed of over half the people that left. 90 out of 140
 yes.attrition %>% group_by(EducationField) %>% summarise(count = n())
-#High turnover in the research&development and sales department
+#High turnover in the research & development and sales department
 yes.attrition %>% group_by(Department) %>% summarise(count = n())
 no.attrition %>% group_by(Department) %>% summarise(count = n())
 ```
@@ -163,6 +161,7 @@ table(predict(modelA,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,3
 confusionMatrix(table(predict(modelA,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)]),test$Attrition))
 #Saved predictions into a dataframe and wrote to csv
 attrition_preds=predict(modelA, newdata = case2.no.attrition)
+
 my_submissionA = tibble("ID"= case2.no.attrition$ID, "Attrition" = attrition_preds)
 write.csv(my_submissionA,"./Case2PredictionsAjmera Attrition.csv",row.names = FALSE)
 ```
@@ -176,10 +175,16 @@ testfit = lm(MonthlyIncome ~ .,data = newemp.data)
 summary(testfit)
 ols_step_backward_p(testfit,prem = 0.05,details = TRUE)
 
-#Final Model with RMSE of 1002
+#Final Linear Model with RMSE of 1002
 finalfit = lm(MonthlyIncome ~ TotalWorkingYears*factor(JobLevel)+DailyRate*factor(JobRole),data = newemp.data)
 summary(finalfit)
-plot(testfit1)
+
+#Saved predictions into a dataframe and wrote to csv
+salary_preds=predict(finalfit, newdata = case2.no.salary)
+
+my_submissionB = tibble("ID"= case2.no.salary$ID, "Attrition" = salary_preds)
+write.csv(my_submissionB,"./Case2PredictionsAjmera Salary.csv",row.names = FALSE)
+
 ```
 
 
