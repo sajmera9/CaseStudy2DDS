@@ -11,20 +11,25 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 library(tidyverse)
-cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
+
+
+#Read all csvs
 emp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
-emp.data[cols] <- lapply(emp.data[cols], factor)
-#sapply(emp.data, class)
 newemp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
-newemp.data$Over18 = NULL
-newemp.data[cols] <- lapply(newemp.data[cols], factor) #Convert columns to factor
-#sapply(emp.data, class)
 case2.no.salary = read.csv("Data/CaseStudy2CompSet No Salary.csv", header=TRUE)
-case2.no.salary[cols] <- lapply(case2.no.salary[cols], factor) #Convert columns to factor
-#sapply(emp.data, class)
+case2.no.attrition = read.csv("Data/CaseStudy2CompSet No Attrition.csv", header=TRUE)
 
+#Convert columns to factor
+cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
 
+emp.data[cols] <- lapply(emp.data[cols], factor)
+newemp.data[cols] <- lapply(newemp.data[cols], factor)
+newemp.data$Over18 = NULL
+case2.no.salary[cols] <- lapply(case2.no.salary[cols], factor)
+case2.no.attrition[cols] <- lapply(case2.no.attrition[cols], factor)
+```
 
+```{r}
 #Check for missing values
 library(naniar)
 gg_miss_var(employee.data)
@@ -39,9 +44,8 @@ yes.attrition = emp.data %>% filter(Attrition == "Yes")
 
 ```
 
-
 ```{r}
-#Attrition employees groupby Business Travel
+#Attrition employees grouped by Business Travel
 yes.attrition %>% group_by(BusinessTravel) %>%
   summarise(
     count = n(),
@@ -50,20 +54,13 @@ yes.attrition %>% group_by(BusinessTravel) %>%
     median = median(MonthlyIncome, na.rm = TRUE),
     IQR = IQR(MonthlyIncome, na.rm = TRUE)
   )
-#Business Travel -- Yes Attrition
-#67% of those that left due to attrition rarely travel
-#**************# To be used in presentation
-yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="BusinessTravel", x = "BusinessTravel")
+#We can see that 67% of those that left due to attrition rarely travel
+# Business travel of Attrition Employees
+yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Business Traveled by Attrition Employees") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Business Traveled", x = "Business Traveled")
+```
 
 
-
-
-#TotalWorkingYears -- Yes Attition
-
-
-
-yes.attrition %>% ggplot(aes(x = TotalWorkingYears, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="TotalWorkingYears", x = "TotalWorkingYears")
-
+```{r}
 yes.attrition %>% group_by(TotalWorkingYears) %>%
   summarise(
     count = n(),
@@ -73,53 +70,36 @@ yes.attrition %>% group_by(TotalWorkingYears) %>%
     IQR = IQR(MonthlyIncome, na.rm = TRUE)
   )
 
-
-yes.attrition %>% 
-mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,10,20,30,41), labels = c("0 to 10 YOE","11 to 20 YOE", "20 to 30 YOE","31 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = cut.workyrs)) + geom_bar()
-
-
-#****************# To be used in presentation
-yes.attrition %>% 
-mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,5,11,20,41), labels = c("0 to 5 YOE","6 to 10 YOE", "11 to 20 YOE","21 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + ggtitle("Total Working Years for Attrition Employees")
-
-
-#*********************#
-yes.attrition %>% ggplot(aes(x = JobRole, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="JobRole", x = "JobRole")
-
-#***********************#
-#StockOptionLevel
-
-yes.attrition %>% ggplot(aes(x = StockOptionLevel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="StockOptionLevel", x = "StockOptionLevel")
-
-no.attrition %>% ggplot(aes(x = StockOptionLevel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="StockOptionLevel", x = "StockOptionLevel")
-
-no.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("No Attrition")
-yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("Yes Attrition")
-
-
+#Total Working Years of Attrition Employees
+#Grouped by years of experience
+yes.attrition %>% mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,5,11,20,41), labels = c("0 to 5 YOE","6 to 10 YOE", "11 to 20 YOE","21 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + ggtitle("Total Working Years for Attrition Employees")+labs(y = "Percent", fill="Total Working Years", x = "Total Working Years")
 ```
 
 
 ```{r}
+#24 of 29 attrition employees are Sales Representatives
+yes.attrition %>% group_by(JobRole) %>% summarise(count = n())
+no.attrition %>% group_by(JobRole) %>% summarise(count = n())
+#Job Roles of Attrition Employees
+yes.attrition %>% ggplot(aes(x = JobRole, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Job Roles of Attrition Employees ") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Job Role", x = "Job Role")
+```
+
+
+```{r}
+#StockOptionLevel
+#Over 70% of attrition employees had no stock options
+yes.attrition %>% ggplot(aes(x = StockOptionLevel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Stock Option Level of Attrition Employees") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Stock Option Level", x = "Stock Option Level")
+```
+
+
+```{r}
+library(onewaytests)
+library(lsmeans)
+
 fit1 = aov(MonthlyIncome ~ JobRole, data = yes.attrition)
 summary(fit1)
 
-##**## Job Satisfaction - MonthlyIncome
-yes.attrition %>% group_by(JobRole) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyIncome, na.rm = TRUE),
-    # sd = sd(MonthlyIncome, na.rm = TRUE),
-    median = median(MonthlyIncome, na.rm = TRUE),
-    IQR = IQR(MonthlyIncome, na.rm = TRUE)
-  )
-##***##
-
-library(onewaytests)
-library(lsmeans)
-#Monthly Income ~ JobRole**********
-#*******************SIGNIFICANT****************#
-#Contrast 1
+#Multiple Comparison Contrast
 fit2 = lm(MonthlyIncome ~ JobRole, data = yes.attrition)
 summary(fit2)
 leastsquare = lsmeans(fit2,"JobRole")
@@ -130,129 +110,29 @@ contrast(leastsquare,Contrasts)
 
 
 ```{r}
-
-yes.attrition %>% group_by(EducationField) %>%
-  summarise(
-    count = n()
-  )
-
-#Life sciences and medical field composed of over half the people that left. (53+37)/140
-
-no.attrition %>% group_by(EducationField) %>%
-  summarise(
-    count = n()
-  )
-
-#high turnover in the research&development and sales department
-
-yes.attrition %>% group_by(Department) %>%
-  summarise(
-    count = n(),
-  )
-
-no.attrition %>% group_by(Department) %>%
-  summarise(
-    count = n(),
-  )
-
-#*****#
-
-no.attrition %>% group_by(JobRole) %>%
-  summarise(
-    count = n(),
-  )
-
-yes.attrition %>% group_by(JobRole) %>%
-  summarise(
-    count = n(),
-  )
-
-
-sales.rep.no = no.attrition %>% filter(JobRole == "Sales Representative")
-sales.rep.yes = yes.attrition %>% filter(JobRole == "Sales Representative")
-
-
-sales.rep.yes %>% group_by(EducationField) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-
-sales.rep.yes %>% group_by(TrainingTimesLastYear) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-sales.rep.no %>% group_by(TrainingTimesLastYear) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-sales.rep.no %>% group_by(YearsInCurrentRole) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-yes.attrition %>% group_by(YearsInCurrentRole) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
+#Life sciences and medical field composed of over half the people that left. 90 out of 140
+yes.attrition %>% group_by(EducationField) %>% summarise(count = n())
+#High turnover in the research&development and sales department
+yes.attrition %>% group_by(Department) %>% summarise(count = n())
+no.attrition %>% group_by(Department) %>% summarise(count = n())
 ```
 
 
-
-
 ```{r}
-#Part 2
-emp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
-case2.no.attrition = read.csv("Data/CaseStudy2CompSet No Attrition.csv", header = TRUE)
-cols <- c("JobSatisfaction", "Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
+#Part 2 - Naive Bayes
 library(class)
 library(caret)
 library(e1071)
-emp.data[cols] <- lapply(emp.data[cols], factor)  ## as.factor() could also be used
-#sapply(emp.data, class)
-case2.no.attrition[cols] <- lapply(case2.no.attrition[cols], factor)  ## as.factor() could also be used
-#sapply(case2.no.attrition, class)
-
-
-
-# Convert columns to factor
-cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
-
-
-
+#Using Naive Bayes
+#Average Accuracy, Sensitivity, and Specificity for 100 iterations
+#Average Sensitivity and Accuracy are above .60
 iterations = 100
 masterAcc = matrix(nrow = iterations)
 masterSen = matrix(nrow = iterations)
 masterSpe = matrix(nrow = iterations)
-splitPerc = .70 #Training / Test split Percentage
-
+splitPerc = .70 #Training/Test split
 for(j in 1:iterations)
 {
-  
   trainIndices = sample(1:dim(emp.data)[1],round(splitPerc * dim(emp.data)[1]))
   train = emp.data[trainIndices,]
   test = emp.data[-trainIndices,]
@@ -262,9 +142,7 @@ for(j in 1:iterations)
   masterAcc[j] = CM$overall[1]
   masterSen[j] = CM$byClass["Sensitivity"]
   masterSpe[j] = CM$byClass["Specificity"]
-
 }
-
 MeanAcc = colMeans(masterAcc)
 MeanSen = colMeans(masterSen)
 MeanSpe = colMeans(masterSpe)
@@ -272,64 +150,52 @@ MeanAcc
 MeanSen
 MeanSpe
 
-#**** above .60 in Sensitivity and Specificity - FINAL MODEL ****#
+#Using Final Naive Bayes Model with Sensitivity/Specificity > 0.60
+#Sensitivity : 0.9070          
+#Specificity : 0.6739  
+set.seed(75)
 splitPerc = 0.70
 trainIndices = sample(1:dim(emp.data)[1],round(splitPerc * dim(emp.data)[1]))
 train = emp.data[trainIndices,]
 test = emp.data[-trainIndices,]
-model12 = naiveBayes(train[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)],train$Attrition)
-table(predict(model12,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)]),test$Attrition)
-confusionMatrix(table(predict(model12,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)]),test$Attrition))
-model12_preds=predict(model12, newdata = case2.no.attrition)
-as.data.frame(model12_preds)
-
-# my_submissionA <- data_frame('ID' = test$Id, 'SalePrice' = predicted_prices)
-
-
+modelA = naiveBayes(train[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)],train$Attrition)
+table(predict(modelA,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)]),test$Attrition)
+confusionMatrix(table(predict(modelA,test[,c(2,4,5,9,12,14,15,16,17,20,22,24,25,29,30,31,32,33,34,36)]),test$Attrition))
+#Saved predictions into a dataframe and wrote to csv
+attrition_preds=predict(modelA, newdata = case2.no.attrition)
+my_submissionA = tibble("ID"= case2.no.attrition$ID, "Attrition" = attrition_preds)
+write.csv(my_submissionA,"./Case2PredictionsAjmera Attrition.csv",row.names = FALSE)
 ```
-
-
 
 ```{r}
 #Part 3
-newemp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
-# Convert columns to factor
-cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
-newemp.data[cols] <- lapply(newemp.data[cols], factor)  ## as.factor() could also be used
-sapply(newemp.data, class)
+library(DAAG)
+library(olsrr)
+#Fitted all variables into a linear model and used backwards elimination to remove insignificant variables
+testfit = lm(MonthlyIncome ~ .,data = newemp.data)
+summary(testfit)
+ols_step_backward_p(testfit,prem = 0.05,details = TRUE)
 
-newemp.data$Over18 = NULL
-
-case2.no.salary = read.csv("Data/CaseStudy2CompSet No Salary.csv", header=TRUE)
-cols <- c("JobSatisfaction", "Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction","WorkLifeBalance","BusinessTravel","StockOptionLevel")
-
-case2.no.salary[cols] <- lapply(case2.no.salary[cols], factor)  ## as.factor() could also be used
-sapply(case2.no.salary, class)
-
-
+#Final Model with RMSE of 1002
+finalfit = lm(MonthlyIncome ~ TotalWorkingYears*factor(JobLevel)+DailyRate*factor(JobRole),data = newemp.data)
+summary(finalfit)
+plot(testfit1)
 ```
+
 
 
 ```{r}
-library(DAAG)
-library(olsrr)
-testfit = lm(MonthlyIncome ~ .,data = newemp.data)
-plot(testfit)
-summary(testfit)
-RMSE(testfit)
-ols_step_backward_p(testfit,prem = 0.05,details = TRUE)
-testfit1 = lm(MonthlyIncome ~ TotalWorkingYears*factor(JobLevel)+DailyRate*factor(JobRole),data = newemp.data)
+#Other Unused Plots
 
-summary(testfit1)
-plot(testfit1)
-press(testfit1)
+# yes.attrition %>% 
+# mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,10,20,30,41), labels = c("0 to 10 YOE","11 to 20 YOE", "20 to 30 YOE","31 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = cut.workyrs)) + geom_bar()
 
-press(testfit2)
-plot(testfit2)
-summary(testfit2)
+# yes.attrition %>% ggplot(aes(x = TotalWorkingYears, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Total Working Years", x = "Total Working Years")
+
+# no.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("No Attrition")
+# 
+# yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("Yes Attrition")
+
 ```
-
-
-
 
 
