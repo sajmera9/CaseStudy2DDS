@@ -76,19 +76,53 @@ yes.attrition %>% ggplot(aes(x = as.factor(JobSatisfaction), fill = as.factor(Jo
 # 
 # no.attrition %>% ggplot(aes(x = JobSatisfaction, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Satisfaction Level", x = "Job Satisfaction")
 
-no.attrition %>% ggplot(aes(x = BusinessTravel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="BusinessTravel", x = "Job Satisfaction")
+#Business Travel -- Yes Attrition
+#**************# To be used in presentation
+yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="BusinessTravel", x = "BusinessTravel")
 
-yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("No Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="BusinessTravel", x = "Job Satisfaction")
 
 #67% of those that left due to attrition travel rarely
 yes.attrition %>% group_by(BusinessTravel) %>%
   summarise(
     count = n(),
-    mean = mean(MonthlyRate, na.rm = TRUE),
-    sd = sd(MonthlyRate, na.rm = TRUE),
-    median = median(MonthlyRate, na.rm = TRUE),
-    IQR = IQR(MonthlyRate, na.rm = TRUE)
+    mean = mean(MonthlyIncome, na.rm = TRUE),
+    sd = sd(MonthlyIncome, na.rm = TRUE),
+    median = median(MonthlyIncome, na.rm = TRUE),
+    IQR = IQR(MonthlyIncome, na.rm = TRUE)
   )
+
+#TotalWorkingYears -- Yes Attition
+
+yes.attrition %>% ggplot(aes(x = TotalWorkingYears, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="TotalWorkingYears", x = "TotalWorkingYears")
+
+yes.attrition %>% group_by(TotalWorkingYears) %>%
+  summarise(
+    count = n(),
+    mean = mean(MonthlyIncome, na.rm = TRUE),
+    sd = sd(MonthlyIncome, na.rm = TRUE),
+    median = median(MonthlyIncome, na.rm = TRUE),
+    IQR = IQR(MonthlyIncome, na.rm = TRUE)
+  )
+
+
+yes.attrition %>% 
+mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,10,20,30,41), labels = c("0 to 10 YOE","11 to 20 YOE", "20 to 30 YOE","31 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = cut.workyrs)) + geom_bar()
+
+
+#****************# To be used in presentation
+yes.attrition %>% 
+mutate(cut.workyrs = cut(TotalWorkingYears, breaks = c(-1,5,11,20,41), labels = c("0 to 5 YOE","6 to 10 YOE", "11 to 20 YOE","21 to 40 YOE"))) %>% ggplot(aes(x = cut.workyrs, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + ggtitle("Total Working Years for Attrition Employees")
+
+
+#*********************#
+yes.attrition %>% ggplot(aes(x = JobRole, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="JobRole", x = "JobRole")
+
+#***********************#
+#StockOptionLevel
+
+yes.attrition %>% ggplot(aes(x = StockOptionLevel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="StockOptionLevel", x = "StockOptionLevel")
+
+no.attrition %>% ggplot(aes(x = StockOptionLevel, fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="StockOptionLevel", x = "StockOptionLevel")
 
 no.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("No Attrition")
 yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_bar() + ggtitle("Yes Attrition")
@@ -96,346 +130,48 @@ yes.attrition %>% ggplot(aes(x = BusinessTravel, fill = BusinessTravel)) + geom_
 
 ```
 
-```{r}
-ggplot(data = employee.data, aes(x=DailyRate)) +
-geom_histogram(aes(fill=JobSatisfaction)) +
-facet_wrap( ~ JobSatisfaction, ncol=2) +
-theme_bw()
-
-
-ggplot(data = employee.data, aes(x=HourlyRate)) +
-geom_histogram(aes(fill=JobSatisfaction)) +
-facet_wrap( ~ JobSatisfaction, ncol=2) +
-theme_bw()
-
-ggplot(data = employee.data, aes(x=MonthlyRate)) +
-geom_histogram(aes(fill=JobSatisfaction)) +
-facet_wrap( ~ JobSatisfaction, ncol=2) +
-theme_bw()
-
-ggplot(data = employee.data, aes(x=MonthlyIncome)) +
-geom_histogram(aes(fill=JobSatisfaction)) +
-facet_wrap( ~ JobSatisfaction, ncol=2) +
-theme_bw()
-
-ggplot(data = employee.data, aes(sample=MonthlyIncome)) +
-stat_qq() +
-facet_wrap( ~ JobSatisfaction, ncol=1) +
-theme_bw()
-```
-
 
 ```{r}
-fit = aov(MonthlyIncome ~ JobRole, data = emp.data)
-summary(fit)
 fit1 = aov(MonthlyIncome ~ JobRole, data = yes.attrition)
 summary(fit1)
 
-
-##***## 
-##**## Job Satisfaction - HourlyRate
-emp.data %>% group_by(MonthlyIncome) %>%
+##**## Job Satisfaction - MonthlyIncome
+yes.attrition %>% group_by(JobRole) %>%
   summarise(
     count = n(),
     mean = mean(MonthlyIncome, na.rm = TRUE),
-    sd = sd(MonthlyIncome, na.rm = TRUE),
+    # sd = sd(MonthlyIncome, na.rm = TRUE),
     median = median(MonthlyIncome, na.rm = TRUE),
     IQR = IQR(MonthlyIncome, na.rm = TRUE)
   )
 ##***##
 
 library(onewaytests)
-
 library(lsmeans)
+#Monthly Income ~ JobRole**********
 #*******************SIGNIFICANT****************#
 #Contrast 1
-fit4 = lm(MonthlyIncome ~ JobRole, data = employee.data)
-summary(fit4)
-fit4
-
-leastsquare = lsmeans(fit4,"JobSatisfaction")
-
-Contrasts = list(OneTwoVersusThreeFour= c(0.5,0.5,-0.5,-0.5))
-
-contrast(leastsquare,Contrasts)
-
-#Contrast 2
-fit4 = lm(HourlyRate ~ JobSatisfaction, data = employee.data)
-summary(fit4)
-fit4
-
-leastsquare = lsmeans(fit4,"JobSatisfaction")
-
-Contrasts = list(OneTwoVersusThreeFour= c(1,0,-0.5,-0.5))
-#Contrasts = list(OneTwoVersusThreeFour= c(1,0,0,-1))
-#Contrasts = list(OneTwoVersusThreeFour= c(1,0,0,-1))
-contrast(leastsquare,Contrasts)
-
-
-
-
-bf.test(HourlyRate ~ JobSatisfaction, data = employee.data)
-welch.test(HourlyRate ~ JobSatisfaction, data = employee.data)
-
-
-#Job Satisfaction - DailyRate
-employee.data %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(DailyRate, na.rm = TRUE),
-    sd = sd(DailyRate, na.rm = TRUE),
-    median = median(DailyRate, na.rm = TRUE),
-    IQR = IQR(DailyRate, na.rm = TRUE)
-  )
-
-
-fit1 = aov(DailyRate~JobSatisfaction, data = employee.data)
-summary(fit1)
-
-#Job Satisfaction - MonthlyRate
-employee.data %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyRate, na.rm = TRUE),
-    sd = sd(MonthlyRate, na.rm = TRUE),
-    median = median(MonthlyRate, na.rm = TRUE),
-    IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-fit2 = aov(MonthlyRate~JobSatisfaction, data = employee.data)
+fit2 = lm(MonthlyIncome ~ JobRole, data = yes.attrition)
 summary(fit2)
-
-#Job Satisfaction - MonthlyIncome
-employee.data %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyIncome, na.rm = TRUE),
-    sd = sd(MonthlyIncome, na.rm = TRUE),
-    median = median(MonthlyIncome, na.rm = TRUE),
-    IQR = IQR(MonthlyIncome, na.rm = TRUE)
-  )
-
-
-bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-fit3 = aov(MonthlyIncome~JobSatisfaction, data = employee.data)
-summary(fit3)
-kruskal.test(MonthlyIncome ~ JobSatisfaction, data=employee.data)
-
-
-
-
-bf.test(DailyRate ~ JobSatisfaction, data = employee.data)
-welch.test(DailyRate ~ JobSatisfaction, data = employee.data)
-
-bf.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-aov(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-welch.test(MonthlyIncome ~ JobSatisfaction, data = employee.data)
-
-group_by(employee.data$JobSatisfaction) %>% summarize(meanAge = count(DailyRate))
-
+leastsquare = lsmeans(fit2,"JobRole")
+Contrasts = list(OtherJobRolesvsSalesRepresentative= c(-1,-1,-1,-1,-1,-1,-1,-1,8))
+contrast(leastsquare,Contrasts)
 ```
 
 
-```{r}
-#NO ATTRITION
-
-no.attrition %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyRate, na.rm = TRUE),
-    sd = sd(MonthlyRate, na.rm = TRUE),
-    median = median(MonthlyRate, na.rm = TRUE),
-    IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-
-
-fitno0 = aov(MonthlyRate~JobSatisfaction, data = no.attrition)
-summary(fitno0)
-fitno0
-```
 
 ```{r}
-#Yes Attrition
-# yes.attrition ~ Jobsatisfaction
-yes.attrition %>% group_by(JobSatisfaction) %>%
+
+yes.attrition %>% group_by(EducationField) %>%
   summarise(
-    count = n(),
-    mean = mean(HourlyRate, na.rm = TRUE),
-    sd = sd(HourlyRate, na.rm = TRUE),
-    median = median(HourlyRate, na.rm = TRUE),
-    IQR = IQR(HourlyRate, na.rm = TRUE)
-  )
-#not enough evidence
-fityes = aov(HourlyRate~JobSatisfaction, data = yes.attrition)
-summary(fityes)
-
-# yes.attrition ~ Jobsatisfaction
-
-
-#************Significant****************#
-
-ggplot(data = yes.attrition, aes(x=MonthlyRate)) +
-geom_histogram(aes(fill=JobSatisfaction)) +
-facet_wrap( ~ JobSatisfaction, ncol=2) +
-theme_bw()
-
-yes.attrition %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyRate, na.rm = TRUE),
-    sd = sd(MonthlyRate, na.rm = TRUE),
-    median = median(MonthlyRate, na.rm = TRUE),
-    IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-hist(yes.attrition$MonthlyRate)
-
-
-
-fityes0 = aov(MonthlyRate~JobSatisfaction, data = yes.attrition)
-summary(fityes0)
-fityes0
-
-leastsquare = lsmeans(fityes0,"JobSatisfaction")
-
-#Contrasts = list(AverageOneTwoVersusAverageThreeFour= c(0.5,0.5,-0.5,-0.5))
-#contrast(leastsquare,Contrasts)
-
-# Contrast2 = list(OneVersusAverageThreeFour= c(1,0,-0.5,-0.5))
-# contrast(leastsquare,Contrast2)
-
-# Contrast3 = list(OneVersusAverageTwoThreeFour= c(3,-1,-1,-1))
-# contrast(leastsquare,Contrast3)
-
-#Contrasts = list(OneTwoVersusThreeFour= c(1,0,0,-1))
-
-
-#***************************#
-
-
-
-
-#DailyRate
-yes.attrition %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(DailyRate, na.rm = TRUE),
-    sd = sd(DailyRate, na.rm = TRUE),
-    median = median(DailyRate, na.rm = TRUE),
-    IQR = IQR(DailyRate, na.rm = TRUE)
-  )
-
-
-
-fityes1 = aov(DailyRate~JobSatisfaction, data = yes.attrition)
-summary(fityes1)
-
-
-#MonthlyIncome
-yes.attrition %>% group_by(JobSatisfaction) %>%
-  summarise(
-    count = n(),
-    mean = mean(MonthlyIncome, na.rm = TRUE),
-    sd = sd(MonthlyIncome, na.rm = TRUE),
-    median = median(MonthlyIncome, na.rm = TRUE),
-    IQR = IQR(MonthlyIncome, na.rm = TRUE)
-  )
-
-
-
-fityes2 = aov(MonthlyIncome~JobSatisfaction, data = yes.attrition)
-summary(fityes2)
-
-
-fityes3 = aov(MonthlyIncome~JobSatisfaction, data = yes.attrition)
-summary(fityes2)
-
-#MonthlyRate
-```
-
-```{r}
-yes.attrition %>% ggplot(aes(x = as.factor(yes.attrition$YearsSinceLastPromotion))) + geom_bar()
-no.attrition %>% ggplot(aes(x = as.factor(no.attrition$YearsSinceLastPromotion))) + geom_bar()
-
-yes.attrition %>% ggplot(aes(x = as.factor(YearsSinceLastPromotion), fill = factor(..x..), y=..prop.., group = 1)) + geom_bar() + ggtitle("Yes Attrition") + geom_text(aes( label = scales::percent(..prop..),y= ..prop.. ), stat= "count", vjust = -.5) + scale_y_continuous(labels = scales::percent) + labs(y = "Percent", fill="Years", x = "YearsSinceLastPromotion")
-
-
-employee.data %>% group_by(YearsSinceLastPromotion) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-yes.attrition %>% group_by(YearsSinceLastPromotion) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-no.attrition %>% group_by(YearsSinceLastPromotion) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-yes.attrition %>% group_by(JobInvolvement) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-no.attrition %>% group_by(JobInvolvement) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-no.attrition %>% group_by(EducationField) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
+    count = n()
   )
 
 #Life sciences and medical field composed of over half the people that left. (53+37)/140
 
 no.attrition %>% group_by(EducationField) %>%
   summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
-  )
-
-
-yes.attrition %>% group_by(EducationField) %>%
-  summarise(
-    count = n(),
-    # mean = mean(MonthlyRate, na.rm = TRUE),
-    # sd = sd(MonthlyRate, na.rm = TRUE),
-    # median = median(MonthlyRate, na.rm = TRUE),
-    # IQR = IQR(MonthlyRate, na.rm = TRUE)
+    count = n()
   )
 
 #high turnover in the research&development and sales department
@@ -563,7 +299,9 @@ no.attrition %>% ggplot(aes(x = as.factor(YearsSinceLastPromotion), fill = facto
 str(employee.data)
 
 emp.data = read.csv("Data/CaseStudy2-data.csv", header = TRUE)
-
+library(class)
+library(caret)
+library(e1071)
 # Convert columns to factor
 cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel","PerformanceRating","RelationshipSatisfaction", "WorkLifeBalance","BusinessTravel","StockOptionLevel")
 emp.data[cols] <- lapply(emp.data[cols], factor)  ## as.factor() could also be used
@@ -674,9 +412,7 @@ case2.no.attrition[cols] <- lapply(case2.no.attrition[cols], factor)  ## as.fact
 sapply(case2.no.attrition, class)
 
 case2.no.attrition
-library(class)
-library(caret)
-library(e1071)
+
 
 
 
