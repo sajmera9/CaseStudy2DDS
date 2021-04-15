@@ -22,6 +22,7 @@ cols <- c("JobSatisfaction","Education", "EnvironmentSatisfaction", "JobInvolvem
 
 emp.data[cols] <- lapply(emp.data[cols], factor)
 newemp.data[cols] <- lapply(newemp.data[cols], factor)
+#Remove column with one factor
 newemp.data$Over18 = NULL
 case2.no.salary[cols] <- lapply(case2.no.salary[cols], factor)
 case2.no.attrition[cols] <- lapply(case2.no.attrition[cols], factor)
@@ -30,9 +31,9 @@ case2.no.attrition[cols] <- lapply(case2.no.attrition[cols], factor)
 ```{r}
 #Check for missing values
 library(naniar)
-gg_miss_var(employee.data)
+gg_miss_var(emp.data)
 #No missing values in employee.data
-sapply(employee.data, function(x) sum(is.na(x)))
+sapply(emp.data, function(x) sum(is.na(x)))
 ```
 
 ```{r}
@@ -181,14 +182,14 @@ testfit = lm(MonthlyIncome ~ .,data = newemp.data)
 summary(testfit)
 ols_step_backward_p(testfit,prem = 0.05,details = TRUE)
 
-#Final Linear Model with RMSE of 1002
-finalfit = lm(MonthlyIncome ~ TotalWorkingYears*factor(JobLevel)+DailyRate*factor(JobRole),data = newemp.data)
-summary(finalfit)
+#Final Linear Model with RMSE of 984.3
+finalfit1 = lm(MonthlyIncome ~factor(JobLevel)+factor(JobRole)+TotalWorkingYears+DailyRate+TotalWorkingYears*factor(JobLevel)+TotalWorkingYears*factor(JobRole), data = newemp.data)
+summary(finalfit1)
 
 #Saved predictions into a dataframe and wrote to csv
-salary_preds=predict(finalfit, newdata = case2.no.salary)
+salary_preds=predict(finalfit1, newdata = case2.no.salary)
 
-my_submissionB = tibble("ID"= case2.no.salary$ID, "Attrition" = salary_preds)
+my_submissionB = tibble("ID"= case2.no.salary$ID, "Salary" = salary_preds)
 write.csv(my_submissionB,"./Case2PredictionsAjmera Salary.csv",row.names = FALSE)
 
 ```
